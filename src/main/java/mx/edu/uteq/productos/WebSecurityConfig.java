@@ -4,8 +4,11 @@
  */
 package mx.edu.uteq.productos;
 
+import mx.edu.uteq.productos.service.UsuarioDetailsServcie;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -22,27 +25,35 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class WebSecurityConfig {
 
+    @Autowired
+    private UsuarioDetailsServcie userDetailsService;
+
     @Bean
     public static BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() throws Exception {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User
-                .withUsername("user")
-                .password(passwordEncoder().encode("123456"))
-                .roles("USER")
-                .build()
-        );
-        manager.createUser(User
-                .withUsername("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN", "USER")
-                .build()
-        );
-        return manager;
+//    @Bean
+//    public UserDetailsService userDetailsService() throws Exception {
+//        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+//        manager.createUser(User
+//                .withUsername("user")
+//                .password(passwordEncoder().encode("123456"))
+//                .roles("USER")
+//                .build()
+//        );
+//        manager.createUser(User
+//                .withUsername("admin")
+//                .password(passwordEncoder().encode("admin"))
+//                .roles("ADMIN", "USER")
+//                .build()
+//        );
+//        return manager;
+//    }
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
+        builder.userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
     }
 
     @Bean
